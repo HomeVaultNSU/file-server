@@ -1,10 +1,23 @@
 plugins {
     id 'java'
     id 'groovy'
+    id 'application'
 }
 
 java {
     sourceCompatibility = '21'
+}
+
+application {
+    mainClass = 'ru.homevault.fileserver.Application'
+}
+
+task runApp(type: JavaExec, dependsOn: build) {
+    group = 'application'
+    description = 'Runs the Home Vault File Server application'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'ru.homevault.fileserver.Application'
+    jvmArgs = ["-Dspring.profiles.active=$profile"]
 }
 
 ext {
