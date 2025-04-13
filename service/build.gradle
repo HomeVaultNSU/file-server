@@ -1,0 +1,36 @@
+plugins {
+    id 'java'
+    id 'groovy'
+}
+
+java {
+    sourceCompatibility = '21'
+}
+
+ext {
+    springBootVersion = '3.4.3'
+    lombokVersion = '1.18.36'
+    spockFrameworkRelease = '4.0'
+    spockFrameworkVersion = '2.4'
+    jakartaValidationVersion = '3.1.1'
+}
+
+dependencies {
+    implementation "org.springframework.boot:spring-boot-starter-web:$springBootVersion"
+    implementation "jakarta.validation:jakarta.validation-api:$jakartaValidationVersion"
+
+    compileOnly "org.projectlombok:lombok:$lombokVersion"
+
+    annotationProcessor "org.projectlombok:lombok:$lombokVersion"
+
+    testImplementation "org.spockframework:spock-core:$spockFrameworkVersion-M5-groovy-$spockFrameworkRelease"
+    testImplementation "org.spockframework:spock-spring:$spockFrameworkVersion-M5-groovy-$spockFrameworkRelease"
+    testImplementation "org.spockframework:spock-junit4:$spockFrameworkVersion-M5-groovy-$spockFrameworkRelease"
+
+    testImplementation "org.springframework.boot:spring-boot-test-autoconfigure:$springBootVersion"
+    testImplementation "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
+}
+
+test {
+    useJUnitPlatform()
+}
