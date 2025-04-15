@@ -1,14 +1,14 @@
 package ru.homevault.fileserver.service;
 
+import org.springframework.core.io.Resource;
+import org.springframework.web.multipart.MultipartFile;
 import ru.homevault.fileserver.dto.DirectoryListing;
-import ru.homevault.fileserver.dto.FileItem;
-
-import java.util.List;
 
 public interface FileService {
 
-    List<FileItem> getDirectoryContent(String path);
-
     DirectoryListing getDirectoryListing(String path, int depth);
 
+    String uploadFile(MultipartFile file, String path);
+
+    Resource downloadFile(String filePath);
 }

@@ -3,13 +3,18 @@ package ru.homevault.fileserver.service;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 import ru.homevault.fileserver.dto.DirectoryListing;
 import ru.homevault.fileserver.dto.FileItem;
 import ru.homevault.fileserver.dto.FileType;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -26,19 +31,6 @@ public class FileServiceBean implements FileService {
 
     @Value("${app.fs.root-dir}")
     private String baseDir;
-
-    @PostConstruct
-    private void init() throws IOException {
-        Path vaultPath = Paths.get(baseDir).normalize().toAbsolutePath();
-
-        if (!Files.exists(vaultPath)) {
-            Files.createDirectories(vaultPath);
-            log.info("Created vault directory: {}", vaultPath);
-
-        } else if (!Files.isDirectory(vaultPath)) {
-            throw new IllegalStateException("Vault path exists but is not a directory: " + vaultPath);
-        }
-    }
 
     @Override
     public DirectoryListing getDirectoryListing(String path, int depth) {
@@ -72,7 +64,47 @@ public class FileServiceBean implements FileService {
     }
 
     @Override
-    public List<FileItem> getDirectoryContent(String path) {
+    public String uploadFile(MultipartFile file, String path) {
+        Path targetDir = Paths.get(baseDir, path).normalize().toAbsolutePath();
+
+        try {
+            if (!Files.exists(targetDir)) {
+                Files.createDirectories(targetDir);
+            }
+
+            String filename = StringUtils.cleanPath(file.getOriginalFilename());
+
+            Path targetPath = targetDir.resolve(filename);
+            file.transferTo(targetPath);
+
+            return (path + "/" + filename).replace("//", "/");
+
+        } catch (IOException e) {
+            throw new RuntimeException("Can't upload file");
+        }
+    }
+
+    @Override
+    public Resource downloadFile(String filePath) {
+        Path file = Paths.get(baseDir, filePath).normalize().toAbsolutePath();
+
+        if (!Files.exists(file)) {
+            throw new IllegalArgumentException("File not found: " + filePath);
+        }
+
+        if (!Files.isRegularFile(file)) {
+            throw new IllegalArgumentException("Path is not a file: " + filePath);
+        }
+
+        try {
+            return new UrlResource(file.toUri());
+
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Could not read file: " + filePath, e);
+        }
+    }
+
+    private List<FileItem> getDirectoryContent(String path) {
         Path fullPath = Paths.get(baseDir, path).normalize().toAbsolutePath();
 
         File directory = fullPath.toFile();
@@ -100,6 +132,19 @@ public class FileServiceBean implements FileService {
                                 .build()
                 )
                 .toList();
+    }
+
+    @PostConstruct
+    private void init() throws IOException {
+        Path vaultPath = Paths.get(baseDir).normalize().toAbsolutePath();
+
+        if (!Files.exists(vaultPath)) {
+            Files.createDirectories(vaultPath);
+            log.info("Created vault directory: {}", vaultPath);
+
+        } else if (!Files.isDirectory(vaultPath)) {
+            throw new IllegalStateException("Vault path exists but is not a directory: " + vaultPath);
+        }
     }
 
     private LocalDateTime convertToLocalDateTime(long millis) {
