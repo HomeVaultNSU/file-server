@@ -1,6 +1,7 @@
 package ru.homevault.fileserver.service;
 
 import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -11,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.homevault.fileserver.dto.DirectoryListing;
 import ru.homevault.fileserver.dto.FileItem;
 import ru.homevault.fileserver.dto.FileType;
+import ru.homevault.fileserver.mapper.FileMapper;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,19 +20,19 @@ import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class FileServiceBean implements FileService {
 
     @Value("${app.fs.root-dir}")
     private String baseDir;
+
+    private final FileMapper fileMapper;
 
     @Override
     public DirectoryListing getDirectoryListing(String path, int depth) {
@@ -46,7 +48,7 @@ public class FileServiceBean implements FileService {
 
         List<DirectoryListing> subdirectories = new ArrayList<>();
         for (FileItem item : items) {
-            if (item.getType() == FileType.D) {
+            if (item.getType() == FileType.DIRECTORY) {
                 String subPath = path.isEmpty()
                         ? item.getName()
                         : (path + "/" + item.getName()).replace("//", "/");
@@ -122,16 +124,7 @@ public class FileServiceBean implements FileService {
             return List.of();
         }
 
-        return Arrays.stream(files)
-                .map(
-                        file -> FileItem.builder()
-                                .name(file.getName())
-                                .type(file.isDirectory() ? FileType.D : FileType.F)
-                                .size(file.isDirectory() ? null : file.length())
-                                .lastModifiedAt(convertToLocalDateTime(file.lastModified()))
-                                .build()
-                )
-                .toList();
+        return Arrays.stream(files).map(fileMapper::mapFileToFileItem).toList();
     }
 
     @PostConstruct
@@ -147,9 +140,4 @@ public class FileServiceBean implements FileService {
         }
     }
 
-    private LocalDateTime convertToLocalDateTime(long millis) {
-        return Instant.ofEpochMilli(millis)
-                .atZone(ZoneId.systemDefault())
-                .toLocalDateTime();
-    }
 }

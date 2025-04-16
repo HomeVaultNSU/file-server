@@ -26,13 +26,19 @@ ext {
     spockFrameworkRelease = '4.0'
     spockFrameworkVersion = '2.4'
     jakartaValidationVersion = '3.1.1'
+    mapStructVersion = '1.6.2'
 }
 
 dependencies {
     implementation "org.springframework.boot:spring-boot-starter-web:$springBootVersion"
     implementation "jakarta.validation:jakarta.validation-api:$jakartaValidationVersion"
 
+    implementation "org.mapstruct:mapstruct:$mapStructVersion"
+
     compileOnly "org.projectlombok:lombok:$lombokVersion"
+
+    annotationProcessor "org.mapstruct:mapstruct-processor:$mapStructVersion"
+    annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
 
     annotationProcessor "org.projectlombok:lombok:$lombokVersion"
 
@@ -42,6 +48,10 @@ dependencies {
 
     testImplementation "org.springframework.boot:spring-boot-test-autoconfigure:$springBootVersion"
     testImplementation "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
+}
+
+compileJava {
+    options.compilerArgs += ['-Amapstruct.defaultComponentModel=spring']
 }
 
 test {

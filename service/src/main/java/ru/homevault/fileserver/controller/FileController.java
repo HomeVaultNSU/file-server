@@ -50,8 +50,10 @@ public class FileController {
         Resource fileResource = fileService.downloadFile(filePath);
 
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION,
-                        "attachment; filename=\"" + fileResource.getFilename() + "\"")
+                .header(
+                    HttpHeaders.CONTENT_DISPOSITION,
+                    "attachment; filename=\"" + fileResource.getFilename() + "\""
+                )
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(fileResource);
     }

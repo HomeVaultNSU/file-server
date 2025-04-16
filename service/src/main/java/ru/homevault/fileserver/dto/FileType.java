@@ -2,8 +2,12 @@ package ru.homevault.fileserver.dto;
 
 public enum FileType {
 
-    F,
+    FILE,
 
-    D
+    DIRECTORY;
 
+    @Override
+    public String toString() {
+        return this.name().substring(0, 1);
+    }
 }
