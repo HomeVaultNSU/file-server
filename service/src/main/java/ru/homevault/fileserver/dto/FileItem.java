@@ -12,11 +12,15 @@ public class FileItem {
 
     String name;
 
-    FileType type;
+    String type;
 
     @Nullable
     Long size;
 
     LocalDateTime lastModifiedAt;
+
+    public boolean isDirectory() {
+        return this.type.equals("D");
+    }
 
 }

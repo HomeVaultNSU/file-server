@@ -20,8 +20,8 @@ public interface FileMapper {
     FileItem mapFileToFileItem(File file);
 
     @Named("mapFileToFileType")
-    default FileType mapFileToFileType(File file) {
-        return file.isDirectory() ? FileType.DIRECTORY : FileType.FILE;
+    default String mapFileToFileType(File file) {
+        return (file.isDirectory() ? FileType.DIRECTORY : FileType.FILE).name().substring(0, 1);
     }
 
     @Named("mapFileToSize")

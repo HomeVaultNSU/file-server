@@ -11,7 +11,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import ru.homevault.fileserver.dto.DirectoryListing;
 import ru.homevault.fileserver.dto.FileItem;
-import ru.homevault.fileserver.dto.FileType;
 import ru.homevault.fileserver.mapper.FileMapper;
 
 import java.io.File;
@@ -36,30 +35,23 @@ public class FileServiceBean implements FileService {
 
     @Override
     public DirectoryListing getDirectoryListing(String path, int depth) {
+        String normalizedPath = normalizePath(path);
+
         List<FileItem> items = getDirectoryContent(path);
 
-        if (depth == 0) {
-            return DirectoryListing.builder()
-                    .path(path)
-                    .items(items)
-                    .subdirectories(List.of())
-                    .build();
-        }
-
         List<DirectoryListing> subdirectories = new ArrayList<>();
-        for (FileItem item : items) {
-            if (item.getType() == FileType.DIRECTORY) {
-                String subPath = path.isEmpty()
-                        ? item.getName()
-                        : (path + "/" + item.getName()).replace("//", "/");
 
-                DirectoryListing subdirectory = getDirectoryListing(subPath, depth - 1);
-                subdirectories.add(subdirectory);
-            }
+        if (depth != 0) {
+            items.stream()
+                    .filter(FileItem::isDirectory)
+                    .forEach(item -> {
+                        String subPath = normalizePath(normalizedPath + "/" + item.getName());
+                        subdirectories.add(getDirectoryListing(subPath, depth - 1));
+                    });
         }
 
         return DirectoryListing.builder()
-                .path(path)
+                .path(normalizedPath)
                 .items(items)
                 .subdirectories(subdirectories)
                 .build();
@@ -79,7 +71,7 @@ public class FileServiceBean implements FileService {
             Path targetPath = targetDir.resolve(filename);
             file.transferTo(targetPath);
 
-            return (path + "/" + filename).replace("//", "/");
+            return normalizePath(path + "/" + filename);
 
         } catch (IOException e) {
             throw new RuntimeException("Can't upload file");
@@ -106,6 +98,23 @@ public class FileServiceBean implements FileService {
         }
     }
 
+    @PostConstruct
+    private void init() throws IOException {
+        Path vaultPath = Paths.get(baseDir).normalize().toAbsolutePath();
+
+        if (!Files.exists(vaultPath)) {
+            Files.createDirectories(vaultPath);
+            log.info("Created vault directory: {}", vaultPath);
+
+        } else if (!Files.isDirectory(vaultPath)) {
+            throw new IllegalStateException("Vault path exists but is not a directory: " + vaultPath);
+        }
+    }
+
+    private String normalizePath(String path) {
+        return (path.startsWith("/") ? path : "/" + path).replace("//", "/");
+    }
+
     private List<FileItem> getDirectoryContent(String path) {
         Path fullPath = Paths.get(baseDir, path).normalize().toAbsolutePath();
 
@@ -125,19 +134,6 @@ public class FileServiceBean implements FileService {
         }
 
         return Arrays.stream(files).map(fileMapper::mapFileToFileItem).toList();
-    }
-
-    @PostConstruct
-    private void init() throws IOException {
-        Path vaultPath = Paths.get(baseDir).normalize().toAbsolutePath();
-
-        if (!Files.exists(vaultPath)) {
-            Files.createDirectories(vaultPath);
-            log.info("Created vault directory: {}", vaultPath);
-
-        } else if (!Files.isDirectory(vaultPath)) {
-            throw new IllegalStateException("Vault path exists but is not a directory: " + vaultPath);
-        }
     }
 
 }

@@ -19,6 +19,9 @@ import ru.homevault.fileserver.dto.DirectoryListing;
 import ru.homevault.fileserver.dto.UploadResponse;
 import ru.homevault.fileserver.service.FileService;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
 @CrossOrigin("*")
 @Validated
 @RestController
@@ -49,11 +52,11 @@ public class FileController {
     public ResponseEntity<Resource> download(@RequestParam("path") String filePath) {
         Resource fileResource = fileService.downloadFile(filePath);
 
+        String encodedFilename = URLEncoder.encode(fileResource.getFilename(), StandardCharsets.UTF_8)
+                .replaceAll("\\+", "%20");
+
         return ResponseEntity.ok()
-                .header(
-                    HttpHeaders.CONTENT_DISPOSITION,
-                    "attachment; filename=\"" + fileResource.getFilename() + "\""
-                )
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename*=UTF-8''" + encodedFilename)
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(fileResource);
     }
