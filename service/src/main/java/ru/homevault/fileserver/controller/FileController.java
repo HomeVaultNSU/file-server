@@ -21,6 +21,7 @@ import ru.homevault.fileserver.service.FileService;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 @CrossOrigin("*")
 @Validated
@@ -52,7 +53,7 @@ public class FileController {
     public ResponseEntity<Resource> download(@RequestParam("path") String filePath) {
         Resource fileResource = fileService.downloadFile(filePath);
 
-        String encodedFilename = URLEncoder.encode(fileResource.getFilename(), StandardCharsets.UTF_8)
+        String encodedFilename = URLEncoder.encode(Objects.requireNonNull(fileResource.getFilename()), StandardCharsets.UTF_8)
                 .replaceAll("\\+", "%20");
 
         return ResponseEntity.ok()
