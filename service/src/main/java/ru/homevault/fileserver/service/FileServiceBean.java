@@ -42,7 +42,7 @@ public class FileServiceBean implements FileService {
         List<DirectoryListing> subdirectories = new ArrayList<>();
 
         String normalizedPath = normalizePath(path);
-        if (depth != 0) {
+        if (depth > 0) {
             items.stream()
                     .filter(FileItem::isDirectory)
                     .forEach(item -> {
@@ -94,6 +94,7 @@ public class FileServiceBean implements FileService {
 
         try {
             return new UrlResource(file.toUri());
+
         } catch (MalformedURLException e) {
             throw new HomeVaultException("Could not read file: " + filePath, HttpStatus.INTERNAL_SERVER_ERROR);
         }
