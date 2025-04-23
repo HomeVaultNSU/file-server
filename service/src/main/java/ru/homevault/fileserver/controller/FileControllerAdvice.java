@@ -23,12 +23,7 @@ public class FileControllerAdvice {
 
     @ExceptionHandler(Throwable.class)
     public ResponseEntity<ErrorResponse> handleThrowable(Throwable t) {
-        return new ResponseEntity<>(
-                ErrorResponse.builder()
-                        .error("Unexpected server error")
-                        .build(),
-                HttpStatus.INTERNAL_SERVER_ERROR
-        );
+        return new ResponseEntity<>(ErrorResponse.builder().error("Unexpected server error").build(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
 

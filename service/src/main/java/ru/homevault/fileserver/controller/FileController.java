@@ -17,11 +17,12 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import ru.homevault.fileserver.dto.DirectoryListing;
 import ru.homevault.fileserver.dto.UploadResponse;
+import ru.homevault.fileserver.exception.HomeVaultException;
 import ru.homevault.fileserver.service.FileService;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Objects;
+import java.util.Optional;
 
 @CrossOrigin("*")
 @Validated
@@ -53,8 +54,9 @@ public class FileController {
     public ResponseEntity<Resource> download(@RequestParam("path") String filePath) {
         Resource fileResource = fileService.downloadFile(filePath);
 
-        String encodedFilename = URLEncoder.encode(Objects.requireNonNull(fileResource.getFilename()), StandardCharsets.UTF_8)
-                .replaceAll("\\+", "%20");
+        String encodedFilename = Optional.ofNullable(fileResource.getFilename())
+                .map(filename -> URLEncoder.encode(filename, StandardCharsets.UTF_8).replaceAll("\\+", "%20"))
+                .orElseThrow(() -> new HomeVaultException("Invalid file name!", HttpStatus.BAD_REQUEST));
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename*=UTF-8''" + encodedFilename)
