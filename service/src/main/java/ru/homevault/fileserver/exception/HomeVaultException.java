@@ -1,9 +1,11 @@
 package ru.homevault.fileserver.exception;
 
+import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 public class HomeVaultException extends RuntimeException {
 
+    @Getter
     HttpStatus httpStatus;
 
 
