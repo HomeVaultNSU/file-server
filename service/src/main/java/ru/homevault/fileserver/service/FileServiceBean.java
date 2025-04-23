@@ -6,11 +6,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import ru.homevault.fileserver.dto.DirectoryListing;
 import ru.homevault.fileserver.dto.FileItem;
+import ru.homevault.fileserver.exception.HomeVaultException;
 import ru.homevault.fileserver.mapper.FileMapper;
 
 import java.io.File;
@@ -22,6 +24,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @Slf4j
@@ -35,12 +38,10 @@ public class FileServiceBean implements FileService {
 
     @Override
     public DirectoryListing getDirectoryListing(String path, int depth) {
-        String normalizedPath = normalizePath(path);
-
         List<FileItem> items = getDirectoryContent(path);
-
         List<DirectoryListing> subdirectories = new ArrayList<>();
 
+        String normalizedPath = normalizePath(path);
         if (depth != 0) {
             items.stream()
                     .filter(FileItem::isDirectory)
@@ -59,22 +60,27 @@ public class FileServiceBean implements FileService {
 
     @Override
     public String uploadFile(MultipartFile file, String path) {
-        Path targetDir = Paths.get(baseDir, path).normalize().toAbsolutePath();
-
         try {
+            if (file.isEmpty()) {
+                throw new HomeVaultException("File is empty!", HttpStatus.BAD_REQUEST);
+            }
+
+            Path targetDir = Paths.get(baseDir, path).normalize().toAbsolutePath();
             if (!Files.exists(targetDir)) {
                 Files.createDirectories(targetDir);
             }
 
-            String filename = StringUtils.cleanPath(file.getOriginalFilename());
+            String filename = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
+            if (filename.contains("..")) {
+                throw new HomeVaultException("Invalid path!", HttpStatus.BAD_REQUEST);
+            }
 
             Path targetPath = targetDir.resolve(filename);
             file.transferTo(targetPath);
 
             return normalizePath(path + "/" + filename);
-
         } catch (IOException e) {
-            throw new RuntimeException("Can't upload file");
+            throw new HomeVaultException("Can't upload file", HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -82,19 +88,14 @@ public class FileServiceBean implements FileService {
     public Resource downloadFile(String filePath) {
         Path file = Paths.get(baseDir, filePath).normalize().toAbsolutePath();
 
-        if (!Files.exists(file)) {
-            throw new IllegalArgumentException("File not found: " + filePath);
-        }
-
-        if (!Files.isRegularFile(file)) {
-            throw new IllegalArgumentException("Path is not a file: " + filePath);
+        if (!Files.exists(file) || !Files.isRegularFile(file)) {
+            throw new HomeVaultException("File not found: " + filePath, HttpStatus.NOT_FOUND);
         }
 
         try {
             return new UrlResource(file.toUri());
-
         } catch (MalformedURLException e) {
-            throw new RuntimeException("Could not read file: " + filePath, e);
+            throw new HomeVaultException("Could not read file: " + filePath, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -119,13 +120,8 @@ public class FileServiceBean implements FileService {
         Path fullPath = Paths.get(baseDir, path).normalize().toAbsolutePath();
 
         File directory = fullPath.toFile();
-
-        if (!directory.exists()) {
-            throw new IllegalArgumentException("Path does not exist: " + path);
-        }
-
-        if (!directory.isDirectory()) {
-            throw new IllegalArgumentException("Path is not a directory: " + path);
+        if (!directory.exists() || !directory.isDirectory()) {
+            throw new HomeVaultException("Directory not found: " + path, HttpStatus.NOT_FOUND);
         }
 
         File[] files = directory.listFiles();
