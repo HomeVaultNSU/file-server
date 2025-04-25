@@ -1,11 +1,12 @@
 package ru.homevault.fileserver.controller;
 
 
-import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -13,7 +14,8 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 import ru.homevault.fileserver.dto.ErrorResponse;
 import ru.homevault.fileserver.exception.HomeVaultException;
 
-import java.util.stream.Collectors;
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 @RestControllerAdvice
@@ -26,7 +28,8 @@ public class FileControllerAdvice {
                 .error(ex.getMessage())
                 .build();
 
-        return ResponseEntity.status(ex.getHttpStatus())
+        return ResponseEntity
+                .status(ex.getHttpStatus())
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(error);
     }
@@ -39,7 +42,8 @@ public class FileControllerAdvice {
                 .error("Unexpected server error")
                 .build();
 
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(error);
     }
@@ -51,7 +55,8 @@ public class FileControllerAdvice {
                 .error("Resource not found: " + ex.getResourcePath())
                 .build();
 
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(error);
     }
@@ -63,21 +68,24 @@ public class FileControllerAdvice {
                 .error("Missing required request parameter: " + ex.getParameterName())
                 .build();
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(error);
     }
 
-    @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<ErrorResponse> handleConstraintViolation(ConstraintViolationException ex) {
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
 
-        String message = ex.getConstraintViolations()
-                .stream()
-                .map(v -> "%s".formatted(v.getMessage()))
-                .collect(Collectors.joining(", "));
+        Map<String, String> errors = new HashMap<>();
+        for (FieldError error : ex.getBindingResult().getFieldErrors()) {
+            errors.put(error.getField(), error.getDefaultMessage());
+        }
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(ErrorResponse.builder().error(message).build());
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(errors);
     }
 
 }
