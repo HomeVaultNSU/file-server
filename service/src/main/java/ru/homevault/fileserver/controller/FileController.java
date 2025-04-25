@@ -1,5 +1,7 @@
 package ru.homevault.fileserver.controller;
 
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
@@ -34,8 +36,8 @@ public class FileController {
 
     @GetMapping("/list")
     public DirectoryListing list(
-            @RequestParam("path") String path,
-            @RequestParam(value = "depth", defaultValue = "0") @Min(0) Integer depth
+            @RequestParam("path") @NotEmpty(message = "Path cannot be empty") String path,
+            @RequestParam(value = "depth", defaultValue = "0") @Min(value = 0, message = "Depth must be >= 0") Integer depth
     ) {
         return fileService.getDirectoryListing(path, depth);
     }
@@ -43,15 +45,19 @@ public class FileController {
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UploadResponse> upload(
             @RequestPart("file") MultipartFile file,
-            @RequestParam(value = "path", defaultValue = "/") String path
+            @RequestParam(value = "path", defaultValue = "/") @Size(max = 255, message = "Path must be <= 255 characters") String path
     ) {
+        if (file.isEmpty()) {
+            throw new HomeVaultException("File cannot be empty!", HttpStatus.BAD_REQUEST);
+        }
+
         String filePath = fileService.uploadFile(file, path);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(UploadResponse.builder().path(filePath).build());
     }
 
     @GetMapping("/download")
-    public ResponseEntity<Resource> download(@RequestParam("path") String filePath) {
+    public ResponseEntity<Resource> download(@RequestParam("path") @NotEmpty(message = "Path cannot be empty") String filePath) {
         Resource fileResource = fileService.downloadFile(filePath);
 
         String encodedFilename = Optional.ofNullable(fileResource.getFilename())
