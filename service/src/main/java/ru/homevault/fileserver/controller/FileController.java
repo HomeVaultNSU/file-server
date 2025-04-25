@@ -36,7 +36,7 @@ public class FileController {
 
     @GetMapping("/list")
     public DirectoryListing list(
-            @RequestParam("path") @NotBlank(message = "Path cannot be blank") String path,
+            @RequestParam(value = "path", defaultValue = "") String path,
             @RequestParam(value = "depth", defaultValue = "0") @Min(value = 0, message = "Depth must be >= 0") Integer depth
     ) {
         return fileService.getDirectoryListing(path, depth);
