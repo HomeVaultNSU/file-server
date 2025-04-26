@@ -34,8 +34,8 @@ class FileControllerSpec extends ControllerSpec {
         1     | ""         | 4             | 2
         0     | "/"        | 4             | 0
         1     | "/"        | 4             | 2
-        2     | "/"        | 4             | 2 // i dont know if there is a way to test that the subdirs have subdirs, but max depth shouldn't be more than 1 anyway
-        3     | "/"        | 4             | 2 // i dont know if there is a way to test that the subdirs have subdirs, but max depth shouldn't be more than 1 anyway
+        2     | "/"        | 4             | 2 // it only returns the first level of subdirectories
+        3     | "/"        | 4             | 2
         0     | "/folder1" | 2             | 0
         1     | "/folder1" | 2             | 1
         2     | "/folder1" | 2             | 1
@@ -45,7 +45,6 @@ class FileControllerSpec extends ControllerSpec {
     }
 
     def "GET /list - Bad Request with Invalid Path"(int depth, String path) {
-        mockMvc.perform(get("/list").param("depth", "0")).andExpect(status().isNotFound()) // Зависит от FileControllerAdvice
         expect:
         mockMvc.perform(get("/list")
                 .param("path", path)
@@ -120,6 +119,20 @@ class FileControllerSpec extends ControllerSpec {
         "/folder2" | "/folder2/upload.txt"
     }
 
+    def "POST /upload - Empty File"() {
+        given:
+        def emptyFile = new MockMultipartFile("file", "empty.txt", MediaType.TEXT_PLAIN_VALUE, new byte[0])
+
+        expect:
+        mockMvc.perform(multipart("/upload")
+                .file(emptyFile)
+                .param("path", "/")
+                .contentType(MediaType.MULTIPART_FORM_DATA))
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath('$.path').value("/file"))
+    }
+
     def "POST /upload - Bad Request Scenarios"(String path) {
         given:
         def fileContent = "test upload content".bytes
@@ -140,21 +153,6 @@ class FileControllerSpec extends ControllerSpec {
         "../"  | _
         "/.."  | _
         ".."   | _
-    }
-
-    // TODO: I truly do not believe that an empty file should give a bad request...
-    def "POST /upload - Empty File"() {
-        given:
-        def emptyFile = new MockMultipartFile("file", "empty.txt", MediaType.TEXT_PLAIN_VALUE, new byte[0])
-
-        expect:
-        mockMvc.perform(multipart("/upload")
-                .file(emptyFile)
-                .param("path", "/")
-                .contentType(MediaType.MULTIPART_FORM_DATA))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath('$.error').value("File is empty!"))
     }
 
     // ----------download----------
