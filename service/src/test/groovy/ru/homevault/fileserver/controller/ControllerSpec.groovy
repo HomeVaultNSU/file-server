@@ -1,16 +1,19 @@
 package ru.homevault.fileserver.controller
 
+import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.test.web.servlet.MockMvc
 import ru.homevault.fileserver.SpringBootSpec
+import ru.homevault.fileserver.utils.VaultUtils
 import spock.lang.Shared
 
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 
+@Slf4j
 @AutoConfigureMockMvc
 class ControllerSpec extends SpringBootSpec {
 
@@ -29,46 +32,24 @@ class ControllerSpec extends SpringBootSpec {
     def setup() {
         if (!setupDone) {
             testRootDir = Paths.get(testRootDirPath).normalize().toAbsolutePath()
-            println "Setting up test directory: ${testRootDir}"
+            log.info "Setting up test directory: ${testRootDir}"
 
             cleanupTestDirectory()
 
-            Files.createDirectories(testRootDir)
-            Files.createFile(testRootDir.resolve("file1.txt"))
-            Files.writeString(testRootDir.resolve("file1.txt"), "content1")
-            Files.createFile(testRootDir.resolve("file2.txt"))
-            Files.writeString(testRootDir.resolve("file2.txt"), "content2")
-
-            Path folder1 = testRootDir.resolve("folder1")
-            Files.createDirectories(folder1)
-            Files.createFile(folder1.resolve("file3.txt"))
-            Files.writeString(folder1.resolve("file3.txt"), "content3")
-
-            Path subfolder1 = folder1.resolve("subfolder1")
-            Files.createDirectories(subfolder1)
-            Files.createFile(subfolder1.resolve("file4.txt"))
-            Files.writeString(subfolder1.resolve("file4.txt"), "content4")
-
-            Path folder2 = testRootDir.resolve("folder2")
-            Files.createDirectories(folder2)
+            try {
+                VaultUtils.createTestVaultStructure(testRootDir)
+                log.info "Test directory structure created successfully in ${testRootDir}"
+            } catch (IOException e) {
+                log.error "Failed to create test directory structure in ${testRootDir}: ${e.message}", e
+                throw new RuntimeException("Failed to setup test environment", e)
+            }
 
             setupDone = true
-            /*
-            * This creates the following directory structure:
-            * testRootDir
-            * ├─── file1.txt
-            * ├─── file2.txt
-            * ├─── folder1
-            * │   ├─── file3.txt
-            * │   └─── subfolder1
-            * │       └─── file4.txt
-            * └─── folder2
-            */
         }
     }
 
     def cleanupSpec() {
-        println "Cleaning up test directory after all tests: ${testRootDir}"
+        log.info "Cleaning up test directory after all tests: ${testRootDir}"
         cleanupTestDirectory()
     }
 
@@ -79,9 +60,13 @@ class ControllerSpec extends SpringBootSpec {
                         .sorted(Comparator.reverseOrder())
                         .map(Path::toFile)
                         .forEach(File::delete)
+                log.info "Cleaned up test directory: ${testRootDir}"
             } catch (IOException e) {
-                println "WARN: Could not completely clean up test directory ${testRootDir}: ${e.message}"
+                log.warn "Could not completely clean up test directory ${testRootDir}: ${e.message}"
             }
+        }
+        else if (testRootDir != null) {
+            log.info "Test directory ${testRootDir} does not exist, no cleanup needed."
         }
     }
 }
