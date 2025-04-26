@@ -1,6 +1,8 @@
 package ru.homevault.fileserver.controller;
 
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -34,15 +36,15 @@ public class FileController {
 
     @GetMapping("/list")
     public DirectoryListing list(
-            @RequestParam("path") String path,
-            @RequestParam(value = "depth", defaultValue = "0") @Min(0) Integer depth
+            @RequestParam(value = "path", defaultValue = "") String path,
+            @RequestParam(value = "depth", defaultValue = "0") @Min(value = 0, message = "Depth must be >= 0") Integer depth
     ) {
         return fileService.getDirectoryListing(path, depth);
     }
 
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UploadResponse> upload(
-            @RequestPart("file") MultipartFile file,
+            @RequestPart("file") @NotNull(message = "File cannot be null") MultipartFile file,
             @RequestParam(value = "path", defaultValue = "/") String path
     ) {
         String filePath = fileService.uploadFile(file, path);
@@ -51,7 +53,9 @@ public class FileController {
     }
 
     @GetMapping("/download")
-    public ResponseEntity<Resource> download(@RequestParam("path") String filePath) {
+    public ResponseEntity<Resource> download(
+            @RequestParam("path") @NotBlank(message = "Path cannot be blank") String filePath
+    ) {
         Resource fileResource = fileService.downloadFile(filePath);
 
         String encodedFilename = Optional.ofNullable(fileResource.getFilename())
@@ -63,5 +67,4 @@ public class FileController {
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(fileResource);
     }
-
 }
