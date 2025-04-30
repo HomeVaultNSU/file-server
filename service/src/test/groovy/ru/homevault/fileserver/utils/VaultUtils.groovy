@@ -1,8 +1,11 @@
 package ru.homevault.fileserver.utils
 
+import groovy.util.logging.Slf4j
+
 import java.nio.file.Files
 import java.nio.file.Path
 
+@Slf4j
 class VaultUtils {
 
     /**
@@ -39,5 +42,35 @@ class VaultUtils {
 
         Path folder2 = testRootDir.resolve("folder2")
         Files.createDirectories(folder2)
+    }
+
+    /**
+     * Cleans up the specified directory by recursively deleting its contents and the directory itself.
+     * Logs information about the cleanup process or warnings if cleanup fails.
+     *
+     * @param directoryPath The path to the directory to clean up.
+     */
+    static void cleanupTestDirectory(Path directoryPath) {
+        if (directoryPath != null && Files.exists(directoryPath)) {
+            try {
+                Files.walk(directoryPath)
+                        .sorted(Comparator.reverseOrder())
+                        .map(Path::toFile)
+                        .forEach(File::delete)
+                log.info "Cleaned up test directory: ${directoryPath}"
+            } catch (IOException e) {
+                log.warn "Could not completely clean up test directory ${directoryPath}: ${e.message}"
+            }
+        } else if (directoryPath != null) {
+            log.info "Test directory ${directoryPath} does not exist, no cleanup needed."
+        }
+    }
+
+    static String normalizePath(String path) {
+        String cleanedPath = path.replaceAll("/+", "/")
+        if (!cleanedPath.startsWith("/")) {
+            cleanedPath = "/" + cleanedPath
+        }
+        return cleanedPath
     }
 }
