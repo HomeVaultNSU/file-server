@@ -2,12 +2,9 @@ package ru.homevault.fileserver.controller
 
 import org.springframework.http.MediaType
 import org.springframework.mock.web.MockMultipartFile
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers
+import ru.homevault.fileserver.utils.VaultUtils
 
-import java.nio.charset.StandardCharsets
 import java.nio.file.Files
-import java.nio.file.Path
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart
@@ -24,7 +21,7 @@ class FileControllerSpec extends ControllerSpec {
                 .param("depth", String.valueOf(depth)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath('$.path').value(normalizePath(path)))
+                .andExpect(jsonPath('$.path').value(VaultUtils.normalizePath(path)))
                 .andExpect(jsonPath('$.items.length()').value(expectedItems))
                 .andExpect(jsonPath('$.subdirectories.length()').value(expectedSubdirs))
 
@@ -204,7 +201,7 @@ class FileControllerSpec extends ControllerSpec {
         path                     | _
         "/non_existent_file.txt" | _
         "non_existent_file.txt"  | _
-        "/folder1"               | _ // TODO: Should folders really not found? maybe pack them into zips or something? (in the future that is)
+        "/folder1"               | _ // Currently folder do not count as downloadable objects
         "folder1/"               | _
     }
 
@@ -216,11 +213,4 @@ class FileControllerSpec extends ControllerSpec {
                 .andExpect(jsonPath('$.error').value("Missing required request parameter: path"))
     }
 
-    private static String normalizePath(String path) {
-        String cleanedPath = path.replaceAll("/+", "/")
-        if (!cleanedPath.startsWith("/")) {
-            cleanedPath = "/" + cleanedPath
-        }
-        return cleanedPath
-    }
 }
