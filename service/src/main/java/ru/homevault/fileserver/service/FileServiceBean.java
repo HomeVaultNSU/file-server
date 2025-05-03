@@ -61,10 +61,6 @@ public class FileServiceBean implements FileService {
     @Override
     public String uploadFile(MultipartFile file, String path) {
         try {
-            if (file.isEmpty()) {
-                throw new HomeVaultException("File is empty!", HttpStatus.BAD_REQUEST);
-            }
-
             Path targetDir = Paths.get(baseDir, path).normalize().toAbsolutePath();
             if (!Files.exists(targetDir)) {
                 Files.createDirectories(targetDir);

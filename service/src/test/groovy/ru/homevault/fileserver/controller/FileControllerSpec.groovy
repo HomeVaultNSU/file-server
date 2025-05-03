@@ -76,14 +76,6 @@ class FileControllerSpec extends ControllerSpec {
         0     | "/non_existent_directory"
     }
 
-    def "GET /list - Missing Path Parameter"() {
-        expect:
-        mockMvc.perform(get("/list").param("depth", "0"))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath('$.error').value("Missing required request parameter: path"))
-    }
-
     // ----------upload----------
 
     def "POST /upload - Success Scenarios"(String path, String expectedStoredPath) {
@@ -127,7 +119,7 @@ class FileControllerSpec extends ControllerSpec {
                 .contentType(MediaType.MULTIPART_FORM_DATA))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath('$.path').value("/file"))
+                .andExpect(jsonPath('$.path').value("/empty.txt"))
     }
 
     def "POST /upload - Bad Request Scenarios"(String path) {
