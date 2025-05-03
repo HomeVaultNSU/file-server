@@ -110,7 +110,12 @@ public class FileServiceBean implements FileService {
     }
 
     private String normalizePath(String path) {
-        return (path.startsWith("/") ? path : "/" + path).replace("//", "/");
+        if (path.trim().isEmpty()) {
+            return "/";
+        }
+
+        String normalized = path.replaceAll("/+", "/");
+        return normalized.startsWith("/") ? "/" : "/" + normalized;
     }
 
     private List<FileItem> getDirectoryContent(String path) {
