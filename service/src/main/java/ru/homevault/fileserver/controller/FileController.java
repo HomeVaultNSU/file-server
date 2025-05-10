@@ -45,7 +45,7 @@ public class FileController {
 
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UploadResponse> upload(
-            @RequestPart("file") @NotNull(message = "File cannot be null") MultipartFile file,
+            @RequestPart("file") MultipartFile file,
             @RequestParam(value = "path", defaultValue = "/") String path
     ) {
         String filePath = fileService.uploadFile(file, path);
