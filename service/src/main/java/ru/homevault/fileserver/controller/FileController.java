@@ -3,6 +3,7 @@ package ru.homevault.fileserver.controller;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -36,7 +37,7 @@ public class FileController {
 
     @GetMapping("/list")
     public DirectoryListing list(
-            @RequestParam(value = "path", defaultValue = "") String path,
+            @RequestParam(value = "path", defaultValue = "") @Pattern(regexp = "^(?!.*/\\\\.\\\\.?(/|$))(/[^/]+)*/?$", message = "Path must be normalized") String path,
             @RequestParam(value = "depth", defaultValue = "0") @Min(value = 0, message = "Depth must be >= 0") Integer depth
     ) {
         return fileService.getDirectoryListing(path, depth);
@@ -54,7 +55,9 @@ public class FileController {
 
     @GetMapping("/download")
     public ResponseEntity<Resource> download(
-            @RequestParam("path") @NotBlank(message = "Path cannot be blank") String filePath
+            @RequestParam("path") @NotBlank(message = "Path cannot be blank")
+            @Pattern(regexp = "^(?!.*/\\\\.\\\\.?(/|$))(/[^/]+)+/?$", message = "Path must be normalized")
+            String filePath
     ) {
         Resource fileResource = fileService.downloadFile(filePath);
 
