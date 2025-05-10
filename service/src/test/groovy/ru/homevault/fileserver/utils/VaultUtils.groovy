@@ -65,12 +65,4 @@ class VaultUtils {
             log.info "Test directory ${directoryPath} does not exist, no cleanup needed."
         }
     }
-
-    static String normalizePath(String path) {
-        String cleanedPath = path.replaceAll("/+", "/")
-        if (!cleanedPath.startsWith("/")) {
-            cleanedPath = "/" + cleanedPath
-        }
-        return cleanedPath
-    }
 }

@@ -21,7 +21,7 @@ class FileControllerSpec extends ControllerSpec {
                 .param("depth", String.valueOf(depth)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath('$.path').value(VaultUtils.normalizePath(path)))
+                .andExpect(jsonPath('$.path').value(path))
                 .andExpect(jsonPath('$.items.length()').value(expectedItems))
                 .andExpect(jsonPath('$.subdirectories.length()').value(expectedSubdirs))
 
