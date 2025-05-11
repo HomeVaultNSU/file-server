@@ -66,6 +66,9 @@ public class FileServiceBean implements FileService {
             }
 
             String filename = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
+            if (filename.contains("..")) {
+                throw new HomeVaultException("Invalid filename, contains '..'!", HttpStatus.BAD_REQUEST);
+            }
 
             Path targetPath = targetDir.resolve(filename);
             file.transferTo(targetPath);
