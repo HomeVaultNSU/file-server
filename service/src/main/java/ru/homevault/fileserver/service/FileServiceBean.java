@@ -66,14 +66,11 @@ public class FileServiceBean implements FileService {
             }
 
             String filename = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
-            if (filename.contains("..")) {
-                throw new HomeVaultException("Invalid path!", HttpStatus.BAD_REQUEST);
-            }
 
             Path targetPath = targetDir.resolve(filename);
             file.transferTo(targetPath);
 
-            return path + "/" + filename;
+            return  "/" + (path.equals("/") ?  filename :  path.replaceAll("^/|/$", "") + "/" + filename);
         } catch (IOException e) {
             throw new HomeVaultException("Can't upload file", HttpStatus.BAD_REQUEST);
         }
