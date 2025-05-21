@@ -46,7 +46,7 @@ public class FileController {
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UploadResponse> upload(
             @RequestPart("file") MultipartFile file,
-            @RequestParam(value = "path", defaultValue = "/") @Pattern(regexp = REGEX_PATTERN) String path
+            @RequestParam(value = "path", defaultValue = "/") @Pattern(regexp = REGEX_PATTERN, message = "Path must be normalized") String path
     ) {
         String filePath = fileService.uploadFile(file, path);
         return ResponseEntity.status(HttpStatus.CREATED)
