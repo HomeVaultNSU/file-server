@@ -41,18 +41,17 @@ public class FileServiceBean implements FileService {
         List<FileItem> items = getDirectoryContent(path);
         List<DirectoryListing> subdirectories = new ArrayList<>();
 
-        String normalizedPath = normalizePath(path);
         if (depth > 0) {
             items.stream()
                     .filter(FileItem::isDirectory)
                     .forEach(item -> {
-                        String subPath = normalizePath(normalizedPath + "/" + item.getName());
+                        String subPath = path + "/" + item.getName();
                         subdirectories.add(getDirectoryListing(subPath, depth - 1));
                     });
         }
 
         return DirectoryListing.builder()
-                .path(normalizedPath)
+                .path(path)
                 .items(items)
                 .subdirectories(subdirectories)
                 .build();
@@ -68,13 +67,13 @@ public class FileServiceBean implements FileService {
 
             String filename = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
             if (filename.contains("..")) {
-                throw new HomeVaultException("Invalid path!", HttpStatus.BAD_REQUEST);
+                throw new HomeVaultException("Invalid filename, contains '..'!", HttpStatus.BAD_REQUEST);
             }
 
             Path targetPath = targetDir.resolve(filename);
             file.transferTo(targetPath);
 
-            return normalizePath(path + "/" + filename);
+            return  "/" + (path.equals("/") ?  filename :  path.replaceAll("^/|/$", "") + "/" + filename);
         } catch (IOException e) {
             throw new HomeVaultException("Can't upload file", HttpStatus.BAD_REQUEST);
         }
@@ -107,10 +106,6 @@ public class FileServiceBean implements FileService {
         } else if (!Files.isDirectory(vaultPath)) {
             throw new IllegalStateException("Vault path exists but is not a directory: " + vaultPath);
         }
-    }
-
-    private String normalizePath(String path) {
-        return (path.startsWith("/") ? path : "/" + path).replace("//", "/");
     }
 
     private List<FileItem> getDirectoryContent(String path) {
