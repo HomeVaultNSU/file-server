@@ -31,7 +31,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class FileServiceBean implements FileService {
 
-    @Value("${app.fs.root-dir:./vault}")
+    @Value("${app.fs.root-dir}")
     private String baseDir;
 
     private final FileMapper fileMapper;

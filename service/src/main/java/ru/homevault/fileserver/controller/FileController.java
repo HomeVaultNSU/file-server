@@ -33,10 +33,11 @@ import java.util.Optional;
 public class FileController {
 
     private final FileService fileService;
+    private static final String REGEX_PATTERN = "^(?!.*/\\.\\.(?:/|$))(?!(?:^|.*/)\\.\\.(?:/|$))(([^/]+/?)*|/([^/]+/?)*)$";
 
     @GetMapping("/list")
     public DirectoryListing list(
-            @RequestParam(value = "path", defaultValue = "") @Pattern(regexp = "^(?!.*/\\.\\.(?:/|$))(?!(?:^|.*/)\\.\\.(?:/|$))(([^/]+/?)*|/([^/]+/?)*)$", message = "Path must be normalized") String path,
+            @RequestParam(value = "path", defaultValue = "") @Pattern(regexp = REGEX_PATTERN, message = "Path must be normalized") String path,
             @RequestParam(value = "depth", defaultValue = "0") @Min(value = 0, message = "Depth must be >= 0") Integer depth
     ) {
         return fileService.getDirectoryListing(path, depth);
@@ -45,7 +46,7 @@ public class FileController {
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UploadResponse> upload(
             @RequestPart("file") MultipartFile file,
-            @RequestParam(value = "path", defaultValue = "/") @Pattern(regexp = "^(?!.*\\.\\.)[/a-zA-Z0-9_-]+(?:/[a-zA-Z0-9_-]+)*/?$") String path
+            @RequestParam(value = "path", defaultValue = "/") @Pattern(regexp = REGEX_PATTERN) String path
     ) {
         String filePath = fileService.uploadFile(file, path);
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -55,7 +56,7 @@ public class FileController {
     @GetMapping("/download")
     public ResponseEntity<Resource> download(
             @RequestParam("path") @NotBlank(message = "Path cannot be blank")
-            @Pattern(regexp = "^(?!.*/\\.\\.(?:/|$))(?!(?:^|.*/)\\.\\.(?:/|$))(([^/]+/?)*|/([^/]+/?)*)$", message = "Path must be normalized")
+            @Pattern(regexp = REGEX_PATTERN, message = "Path must be normalized")
             String filePath
     ) {
         Resource fileResource = fileService.downloadFile(filePath);
