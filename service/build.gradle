@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'groovy'
     id 'application'
+    id 'org.springframework.boot' version '3.4.3'
 }
 
 java {
@@ -18,6 +19,19 @@ task runApp(type: JavaExec, dependsOn: build) {
     classpath = sourceSets.main.runtimeClasspath
     mainClass = 'ru.homevault.fileserver.Application'
     jvmArgs = ["-Dspring.profiles.active=$profile"]
+}
+
+tasks.register("deployJar") {
+    group = "build"
+    dependsOn("test", "bootJar")
+    tasks.findByName("bootJar")?.mustRunAfter("test")
+    doLast {
+        copy {
+            from("$buildDir/libs")
+            into("$project.rootDir/service/deploy")
+            include("*.jar")
+        }
+    }
 }
 
 ext {
