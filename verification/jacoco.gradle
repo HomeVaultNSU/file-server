@@ -1,0 +1,38 @@
+apply plugin: 'jacoco'
+
+tasks.register("codeCoverageReport", JacocoReport) {
+    subprojects { subproject ->
+        subproject.plugins.withType(JacocoPlugin).configureEach {
+            subproject.tasks.matching { t -> t.extensions.findByType(JacocoTaskExtension) }.configureEach { testTask ->
+                if (testTask.extensions.getByType(JacocoTaskExtension).isEnabled()) {
+                    sourceSets subproject.sourceSets.main
+                    executionData(testTask)
+                }
+            }
+            dependsOn(subproject.tasks.withType(Test))
+        }
+    }
+
+    reports {
+        xml.required = true
+    }
+}
+
+subprojects {
+    apply plugin: 'jacoco'
+
+    jacoco {
+        toolVersion = "0.8.11"
+    }
+
+    tasks.withType(Test).configureEach {
+        finalizedBy jacocoTestReport
+    }
+
+    jacocoTestReport {
+        dependsOn test
+        reports {
+            xml.required = true
+        }
+    }
+}

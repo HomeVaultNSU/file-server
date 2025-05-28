@@ -1,0 +1,14 @@
+apply plugin: 'org.sonarqube'
+
+sonar {
+    properties {
+        property 'sonar.host.url', "$sonarUrl"
+        property 'sonar.token', env.SONAR_TOKEN.value
+
+        property 'sonar.coverage.jacoco.xmlReportPaths',
+                "$project.rootDir/build/reports/jacoco/codeCoverageReport/codeCoverageReport.xml"
+
+        property 'sonar.projectName', 'HOMEVAULT-BACKEND'
+        property 'sonar.java.binaries', '**/target/classes'
+    }
+}
