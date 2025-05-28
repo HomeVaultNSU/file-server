@@ -26,10 +26,20 @@ tasks.register("deployJar") {
     dependsOn("test", "bootJar")
     tasks.findByName("bootJar")?.mustRunAfter("test")
     doLast {
+        def deployDir = file("$project.rootDir/service/deploy")
+        def jarFiles = fileTree("$buildDir/libs").matching { include '*.jar' }.files
+
+        if (jarFiles.isEmpty()) {
+            throw new GradleException("JAR file not found in ${buildDir}/libs!")
+        }
+
+        delete deployDir
+        mkdir deployDir
+
         copy {
-            from("$buildDir/libs")
-            into("$project.rootDir/service/deploy")
-            include("*.jar")
+            from jarFiles
+            into deployDir
+            rename { 'app.jar' }
         }
     }
 }
