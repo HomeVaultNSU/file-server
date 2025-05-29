@@ -1,16 +1,7 @@
-on:
-  push:
-    branches:
-      - '*'
-
-env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: file_server
-
+name: Test Action
+on: [push]
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - run: echo "Hello, World!"
