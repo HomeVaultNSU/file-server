@@ -2,9 +2,9 @@ name: Build and Push 'File Server' Docker Image
 
 on:
   push:
-    branches: [ "dev/docker" ]
+    branches: [ "master" ]
   pull_request:
-    branches: [ "dev/docker" ]
+    branches: [ "master" ]
 
 env:
   REGISTRY: ghcr.io
