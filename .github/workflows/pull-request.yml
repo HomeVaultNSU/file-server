@@ -1,0 +1,39 @@
+name: Tests with PR Annotations
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+  push:
+    branches: ['**']
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+
+      - name: Run tests with JUnit output
+        run: ./gradlew test --rerun-tasks -PoutputToConsole=false
+
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          files: |
+            **/build/test-results/test/TEST-*.xml
+          check_name: Unit Test Results
+          comment_on_pr: true
+          comment_title: "Test Results"
+          fail_on: test failures
+          hide_comments: allbutlatest
