@@ -1,9 +1,6 @@
-name: Build and Push Docker Image
+name: Build and Push 'File Server' Docker Image
 
-on:
-  push:
-    branches:
-      - '*'
+on: [push]
 
 env:
   REGISTRY: ghcr.io
