@@ -4,7 +4,7 @@ on: [push]
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: file_server
+  IMAGE_NAME: ${{ github.repository }}/file_server
 
 jobs:
   build:
