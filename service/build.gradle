@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'groovy'
     id 'application'
+    id 'org.springframework.boot' version '3.4.3'
 }
 
 java {
@@ -18,6 +19,29 @@ task runApp(type: JavaExec, dependsOn: build) {
     classpath = sourceSets.main.runtimeClasspath
     mainClass = 'ru.homevault.fileserver.Application'
     jvmArgs = ["-Dspring.profiles.active=$profile"]
+}
+
+tasks.register("deployJar") {
+    group = "build"
+    dependsOn("test", "bootJar")
+    tasks.findByName("bootJar")?.mustRunAfter("test")
+    doLast {
+        def deployDir = file("$project.rootDir/service/deploy")
+        def jarFiles = fileTree("$buildDir/libs").matching { include '*.jar' }.files
+
+        if (jarFiles.isEmpty()) {
+            throw new GradleException("JAR file not found in ${buildDir}/libs!")
+        }
+
+        delete deployDir
+        mkdir deployDir
+
+        copy {
+            from jarFiles
+            into deployDir
+            rename { 'app.jar' }
+        }
+    }
 }
 
 ext {

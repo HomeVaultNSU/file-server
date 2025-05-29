@@ -6,6 +6,14 @@ To start the server run:
 
 `./gradlew :service:runApp`
 
+## Building jar
+
+To run tests and build `.jar` file run:
+
+`./gradlew :service:deployJar`
+
+Then the `.jar` file will be in `service/deploy` (if all tests passed)
+
 ## Verification
 
 To run **sonarqube** verification:
