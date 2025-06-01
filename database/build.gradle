@@ -3,6 +3,9 @@ buildscript {
         classpath 'org.postgresql:postgresql:42.7.5'
         classpath 'org.flywaydb:flyway-database-postgresql:11.3.2'
     }
+    dependencies {
+        classpath 'co.uzzu.dotenv:gradle:2.0.0'
+    }
 }
 
 plugins {
