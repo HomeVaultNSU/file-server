@@ -3,9 +3,6 @@ buildscript {
         classpath 'org.postgresql:postgresql:42.7.5'
         classpath 'org.flywaydb:flyway-database-postgresql:11.3.2'
     }
-    dependencies {
-        classpath 'co.uzzu.dotenv:gradle:2.0.0'
-    }
 }
 
 plugins {
@@ -14,15 +11,15 @@ plugins {
 }
 
 dockerCompose {
-    environment.put "PG_DB_NAME", env.PG_DB_NAME.orElse("postgres")
-    environment.put "PG_USERNAME", env.PG_USERNAME.orElse("postgres")
-    environment.put "PG_PASSWORD", env.PG_PASSWORD.orElse("postgres")
+    environment.put "PG_DB_NAME", env.allVariables.get("PG_DB_NAME")
+    environment.put "PG_USERNAME", env.allVariables.get("PG_USERNAME")
+    environment.put "PG_PASSWORD", env.allVariables.get("PG_PASSWORD")
 }
 
 flyway {
-    url = "jdbc:postgresql://localhost:5433/${env.PG_DB_NAME.orElse("postgres")}"
-    user = env.PG_USERNAME.orElse("postgres")
-    password = env.PG_PASSWORD.orElse("postgres")
+    url = "jdbc:postgresql://localhost:5433/${env.allVariables.get("PG_DB_NAME")}"
+    user = env.allVariables.get("PG_USERNAME")
+    password = env.allVariables.get("PG_PASSWORD")
     locations = ['filesystem:scripts/migrations']
     cleanDisabled = false
 }
