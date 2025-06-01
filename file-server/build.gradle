@@ -26,7 +26,7 @@ tasks.register("deployJar") {
     dependsOn("test", "bootJar")
     tasks.findByName("bootJar")?.mustRunAfter("test")
     doLast {
-        def deployDir = file("$project.rootDir/service/deploy")
+        def deployDir = file("$project.rootDir/file-server/deploy")
         def jarFiles = fileTree("$buildDir/libs").matching { include '*.jar' }.files
 
         if (jarFiles.isEmpty()) {
