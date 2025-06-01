@@ -1,8 +1,6 @@
 name: Tests with PR Annotations
 
 on:
-  pull_request:
-    types: [opened, reopened, synchronize]
   push:
     branches: ['**']
 
