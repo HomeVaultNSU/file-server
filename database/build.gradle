@@ -10,16 +10,22 @@ plugins {
     id 'com.avast.gradle.docker-compose' version '0.17.5'
 }
 
+ext {
+    dbName = env.allVariables.getOrDefault("PG_DB_NAME", "postgres")
+    dbUser = env.allVariables.getOrDefault("PG_USERNAME", "postgres")
+    dbPassword = env.allVariables.getOrDefault("PG_PASSWORD", "postgres")
+}
+
 dockerCompose {
-    environment.put "PG_DB_NAME", env.allVariables.get("PG_DB_NAME")
-    environment.put "PG_USERNAME", env.allVariables.get("PG_USERNAME")
-    environment.put "PG_PASSWORD", env.allVariables.get("PG_PASSWORD")
+    environment.put "PG_DB_NAME", dbName
+    environment.put "PG_USERNAME", dbUser
+    environment.put "PG_PASSWORD", dbPassword
 }
 
 flyway {
-    url = "jdbc:postgresql://localhost:5433/${env.allVariables.get("PG_DB_NAME")}"
-    user = env.allVariables.get("PG_USERNAME")
-    password = env.allVariables.get("PG_PASSWORD")
+    url = "jdbc:postgresql://localhost:5433/${dbName}"
+    user = dbUser
+    password = dbPassword
     locations = ['filesystem:scripts/migrations']
     cleanDisabled = false
 }
