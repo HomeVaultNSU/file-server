@@ -11,15 +11,15 @@ plugins {
 }
 
 dockerCompose {
-    environment.put "PG_DB_NAME", env.PG_DB_NAME.value
-    environment.put "PG_USERNAME", env.PG_USERNAME.value
-    environment.put "PG_PASSWORD", env.PG_PASSWORD.value
+    environment.put "PG_DB_NAME", env.PG_DB_NAME.orElse("postgres")
+    environment.put "PG_USERNAME", env.PG_USERNAME.orElse("postgres")
+    environment.put "PG_PASSWORD", env.PG_PASSWORD.orElse("postgres")
 }
 
 flyway {
-    url = "jdbc:postgresql://localhost:5433/${env.PG_DB_NAME.value}"
-    user = env.PG_USERNAME.value
-    password = env.PG_PASSWORD.value
+    url = "jdbc:postgresql://localhost:5433/${env.PG_DB_NAME.orElse("postgres")}"
+    user = env.PG_USERNAME.orElse("postgres")
+    password = env.PG_PASSWORD.orElse("postgres")
     locations = ['filesystem:scripts/migrations']
     cleanDisabled = false
 }
