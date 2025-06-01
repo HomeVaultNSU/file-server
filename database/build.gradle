@@ -1,0 +1,32 @@
+buildscript {
+    dependencies {
+        classpath 'org.postgresql:postgresql:42.7.5'
+        classpath 'org.flywaydb:flyway-database-postgresql:11.3.2'
+    }
+}
+
+plugins {
+    id 'org.flywaydb.flyway' version '11.3.2'
+    id 'com.avast.gradle.docker-compose' version '0.17.5'
+}
+
+dockerCompose {
+    environment.put "PG_DB_NAME", env.PG_DB_NAME.value
+    environment.put "PG_USERNAME", env.PG_USERNAME.value
+    environment.put "PG_PASSWORD", env.PG_PASSWORD.value
+}
+
+flyway {
+    url = "jdbc:postgresql://localhost:5433/${env.PG_DB_NAME.value}"
+    user = env.PG_USERNAME.value
+    password = env.PG_PASSWORD.value
+    locations = ['filesystem:scripts/migrations']
+    cleanDisabled = false
+}
+
+task flywayCleanAndMigrate(dependsOn: ['flywayClean', 'flywayMigrate']) {
+    group = 'Flyway'
+    description = 'Clean the database and run all migrations'
+
+    tasks.findByName('flywayMigrate').mustRunAfter 'flywayClean'
+}

@@ -1,14 +1,24 @@
 apply plugin: 'org.sonarqube'
 
+def includedModules = [':file-server', ':auth-server']
+
 sonar {
     properties {
         property 'sonar.host.url', "$sonarUrl"
-        property 'sonar.token', env.SONAR_TOKEN.value
-
-        property 'sonar.coverage.jacoco.xmlReportPaths',
-                "$project.rootDir/build/reports/jacoco/codeCoverageReport/codeCoverageReport.xml"
-
+        property 'sonar.token', env.SONARQUBE_TOKEN.value
         property 'sonar.projectName', 'HOMEVAULT-BACKEND'
-        property 'sonar.java.binaries', '**/target/classes'
+        property 'sonar.projectBaseDir', rootDir
+
+        property 'sonar.sources', includedModules.collect {
+            modulePath -> "${project(modulePath).projectDir}/src/main/java"
+        }.join(',')
+
+        property 'sonar.java.binaries', includedModules.collect {
+            modulePath -> "${project(modulePath).buildDir}/classes/java/main"
+        }.join(',')
+
+        property 'sonar.coverage.jacoco.xmlReportPaths', includedModules.collect {
+            modulePath -> "${project(modulePath).buildDir}/reports/jacoco/test/jacocoTestReport.xml"
+        }.join(',')
     }
 }

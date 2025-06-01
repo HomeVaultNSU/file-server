@@ -1,7 +1,4 @@
 plugins {
-    id 'java'
-    id 'jacoco'
-    id 'org.sonarqube' version '5.0.0.4638'
     id 'co.uzzu.dotenv.gradle' version '2.0.0'
 }
 
@@ -11,5 +8,13 @@ allprojects {
     }
 }
 
-apply from: "$project.rootDir/verification/jacoco.gradle"
-apply from: "$project.rootDir/verification/sonar.gradle"
+subprojects {
+    plugins.withId('jacoco') {
+        jacocoTestReport {
+            dependsOn test
+            reports {
+                xml.required = true
+            }
+        }
+    }
+}

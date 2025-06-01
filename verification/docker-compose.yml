@@ -8,3 +8,4 @@ services:
       - "9000:9000"
     environment:
       - SONAR_EMBEDDEDDATABASE_ENABLED=true
+      - SONAR_FORCEAUTHENTICATION=false

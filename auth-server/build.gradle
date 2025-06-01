@@ -11,14 +11,14 @@ java {
 }
 
 application {
-    mainClass = 'ru.homevault.fileserver.Application'
+    mainClass = 'ru.homevault.authserver.Application'
 }
 
 task runApp(type: JavaExec, dependsOn: build) {
     group = 'application'
-    description = 'Runs the Home Vault File Server application'
+    description = 'Runs the Home Vault Auth Server application'
     classpath = sourceSets.main.runtimeClasspath
-    mainClass = 'ru.homevault.fileserver.Application'
+    mainClass = 'ru.homevault.authserver.Application'
     jvmArgs = ["-Dspring.profiles.active=$profile"]
 }
 
@@ -27,7 +27,7 @@ tasks.register("deployJar") {
     dependsOn("test", "bootJar")
     tasks.findByName("bootJar")?.mustRunAfter("test")
     doLast {
-        def deployDir = file("$project.rootDir/file-server/deploy")
+        def deployDir = file("$project.rootDir/auth-server/deploy")
         def jarFiles = fileTree("$buildDir/libs").matching { include '*.jar' }.files
 
         if (jarFiles.isEmpty()) {
@@ -56,6 +56,7 @@ ext {
 dependencies {
     implementation "org.springframework.boot:spring-boot-starter-web:$springBootVersion"
     implementation "org.springframework.boot:spring-boot-starter-validation:$springBootVersion"
+    implementation "org.springframework.boot:spring-boot-starter-security:$springBootVersion"
 
     implementation "org.mapstruct:mapstruct:$mapStructVersion"
 
