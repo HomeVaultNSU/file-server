@@ -18,6 +18,6 @@ Then the `.jar` file will be in `service/deploy` (if all tests passed)
 
 To run **sonarqube** verification:
 
-1. Start sonarqube container in docker `docker-compose up -d`
-2. Create `.env` file in project root and load your access token in variable `SONAR_TOKEN`
-3. Run gradle task `./gradlew sonar`
+1. Start sonarqube container in docker with `./gradlew :verification:composeUp`
+2. Create `.env` file in project root and load your access token in variable `SONARQUBE_TOKEN`
+3. Run gradle task `./gradlew jacocoTestReport sonar`
