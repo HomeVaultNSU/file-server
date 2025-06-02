@@ -2,17 +2,17 @@
 
 ## Starting
 
-To start the server run:
+To start the file-server run:
 
-`./gradlew :service:runApp`
+`./gradlew :file-server:runApp`
 
 ## Building jar
 
 To run tests and build `.jar` file run:
 
-`./gradlew :service:deployJar`
+`./gradlew :file-server:deployJar`
 
-Then the `.jar` file will be in `service/deploy` (if all tests passed)
+Then the `.jar` file will be in `file-server/deploy` (if all tests passed)
 
 ## Verification
 
