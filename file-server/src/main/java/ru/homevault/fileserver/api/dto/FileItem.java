@@ -1,4 +1,4 @@
-package ru.homevault.fileserver.dto;
+package ru.homevault.fileserver.api.dto;
 
 import jakarta.annotation.Nullable;
 import lombok.Builder;

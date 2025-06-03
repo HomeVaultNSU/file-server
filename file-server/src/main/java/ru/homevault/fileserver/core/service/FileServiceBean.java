@@ -1,4 +1,4 @@
-package ru.homevault.fileserver.service;
+package ru.homevault.fileserver.core.service;
 
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -10,10 +10,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
-import ru.homevault.fileserver.dto.DirectoryListing;
-import ru.homevault.fileserver.dto.FileItem;
-import ru.homevault.fileserver.exception.HomeVaultException;
-import ru.homevault.fileserver.mapper.FileMapper;
+import ru.homevault.fileserver.api.dto.DirectoryListing;
+import ru.homevault.fileserver.api.dto.FileItem;
+import ru.homevault.fileserver.core.exception.HomeVaultException;
+import ru.homevault.fileserver.core.mapper.FileMapper;
 
 import java.io.File;
 import java.io.IOException;

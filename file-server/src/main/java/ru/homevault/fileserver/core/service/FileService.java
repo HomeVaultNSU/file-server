@@ -1,8 +1,8 @@
-package ru.homevault.fileserver.service;
+package ru.homevault.fileserver.core.service;
 
 import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
-import ru.homevault.fileserver.dto.DirectoryListing;
+import ru.homevault.fileserver.api.dto.DirectoryListing;
 
 public interface FileService {
 
