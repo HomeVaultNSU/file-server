@@ -1,4 +1,4 @@
-package ru.homevault.fileserver.controller;
+package ru.homevault.fileserver.api.controller;
 
 
 import jakarta.validation.ConstraintViolationException;
@@ -10,8 +10,8 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
-import ru.homevault.fileserver.dto.ErrorResponse;
-import ru.homevault.fileserver.exception.HomeVaultException;
+import ru.homevault.fileserver.api.dto.ErrorResponse;
+import ru.homevault.fileserver.core.exception.HomeVaultException;
 
 import java.util.stream.Collectors;
 

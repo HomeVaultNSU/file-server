@@ -1,6 +1,7 @@
 package ru.homevault.fileserver.mapper
 
 import org.mapstruct.factory.Mappers
+import ru.homevault.fileserver.core.mapper.FileMapper
 import spock.lang.Specification
 
 import java.time.Instant

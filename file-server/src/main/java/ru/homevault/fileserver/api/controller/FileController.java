@@ -1,4 +1,4 @@
-package ru.homevault.fileserver.controller;
+package ru.homevault.fileserver.api.controller;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -17,10 +17,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import ru.homevault.fileserver.dto.DirectoryListing;
-import ru.homevault.fileserver.dto.UploadResponse;
-import ru.homevault.fileserver.exception.HomeVaultException;
-import ru.homevault.fileserver.service.FileService;
+import ru.homevault.fileserver.api.dto.DirectoryListing;
+import ru.homevault.fileserver.api.dto.UploadResponse;
+import ru.homevault.fileserver.core.exception.HomeVaultException;
+import ru.homevault.fileserver.core.service.FileService;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;

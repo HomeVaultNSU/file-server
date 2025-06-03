@@ -1,10 +1,10 @@
-package ru.homevault.fileserver.mapper;
+package ru.homevault.fileserver.core.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
-import ru.homevault.fileserver.dto.FileItem;
-import ru.homevault.fileserver.dto.FileType;
+import ru.homevault.fileserver.api.dto.FileItem;
+import ru.homevault.fileserver.api.dto.FileType;
 
 import java.io.File;
 import java.time.Instant;

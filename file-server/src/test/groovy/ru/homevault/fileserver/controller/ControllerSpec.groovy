@@ -13,7 +13,7 @@ import java.nio.file.Path
 import java.nio.file.Paths
 
 @Slf4j
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(addFilters = false)
 class ControllerSpec extends SpringBootSpec {
 
     @Autowired
