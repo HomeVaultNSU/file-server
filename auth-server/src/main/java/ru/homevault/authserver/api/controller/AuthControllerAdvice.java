@@ -16,9 +16,16 @@ import ru.homevault.authserver.core.exception.HomeVaultException;
 @RequiredArgsConstructor
 public class AuthControllerAdvice {
 
-    @ExceptionHandler(value = {HomeVaultException.class, JWTVerificationException.class})
+    @ExceptionHandler(HomeVaultException.class)
     public ResponseEntity<ErrorResponse> handleHomeVaultException(HomeVaultException ex) {
         return ResponseEntity.status(ex.getHttpStatus())
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(ErrorResponse.builder().error(ex.getMessage()).build());
+    }
+
+    @ExceptionHandler(JWTVerificationException.class)
+    public ResponseEntity<ErrorResponse> handleJWTVerificationException(JWTVerificationException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(ErrorResponse.builder().error(ex.getMessage()).build());
     }
