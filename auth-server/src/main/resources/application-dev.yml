@@ -1,0 +1,14 @@
+app:
+  jwt:
+    secret-key: .xApv..heZ38sOGSea/w#7od.B\2e0jMs]t4+6vrx0%3Jy`zbwMu8RO3g\1c+%LUVidYz@irdRE=Bxy-8Qmn@4*&2T1I>%xZ[~*P
+    leeway: 120
+
+spring:
+  datasource:
+    username: ${PG_USERNAME}
+    password: ${PG_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5433/${PG_DB_NAME}
+
+server:
+  port: 8090
