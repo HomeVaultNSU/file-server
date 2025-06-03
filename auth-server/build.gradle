@@ -21,9 +21,9 @@ task runApp(type: JavaExec, dependsOn: build) {
     mainClass = 'ru.homevault.authserver.Application'
     jvmArgs = [
             "-Dspring.profiles.active=$profile",
-            "-DPG_USERNAME=${env.PG_USERNAME.value}",
-            "-DPG_PASSWORD=${env.PG_PASSWORD.value}",
-            "-DPG_DB_NAME=${env.PG_DB_NAME.value}"
+            "-DPG_USERNAME=${env.allVariables.getOrDefault("PG_USERNAME", "postgres")}",
+            "-DPG_PASSWORD=${env.allVariables.getOrDefault("PG_PASSWORD", "postgres")}",
+            "-DPG_DB_NAME=${env.allVariables.getOrDefault("PG_DB_NAME", "postgres")}"
     ]
 }
 
