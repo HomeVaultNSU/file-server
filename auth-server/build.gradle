@@ -19,7 +19,12 @@ task runApp(type: JavaExec, dependsOn: build) {
     description = 'Runs the Home Vault Auth Server application'
     classpath = sourceSets.main.runtimeClasspath
     mainClass = 'ru.homevault.authserver.Application'
-    jvmArgs = ["-Dspring.profiles.active=$profile"]
+    jvmArgs = [
+            "-Dspring.profiles.active=$profile",
+            "-DPG_USERNAME=${env.PG_USERNAME.value}",
+            "-DPG_PASSWORD=${env.PG_PASSWORD.value}",
+            "-DPG_DB_NAME=${env.PG_DB_NAME.value}"
+    ]
 }
 
 tasks.register("deployJar") {
@@ -52,12 +57,16 @@ ext {
     spockFrameworkVersion = '2.4'
     mapStructVersion = '1.6.2'
     auth0JwtVersion = '4.5.0'
+    postgressqlDriverVersion = '42.7.2'
 }
 
 dependencies {
     implementation "org.springframework.boot:spring-boot-starter-web:$springBootVersion"
     implementation "org.springframework.boot:spring-boot-starter-validation:$springBootVersion"
     implementation "org.springframework.boot:spring-boot-starter-data-jpa:$springBootVersion"
+    implementation "org.springframework.boot:spring-boot-starter-security:$springBootVersion"
+
+    implementation "org.postgresql:postgresql:$postgressqlDriverVersion"
 
     implementation "org.mapstruct:mapstruct:$mapStructVersion"
 
