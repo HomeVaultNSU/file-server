@@ -1,3 +1,5 @@
 app:
   fs:
     root-dir: ./test-vault
+  auth:
+    url: http://localhost:8090/auth
