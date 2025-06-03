@@ -51,14 +51,17 @@ ext {
     spockFrameworkRelease = '4.0'
     spockFrameworkVersion = '2.4'
     mapStructVersion = '1.6.2'
+    auth0JwtVersion = '4.5.0'
 }
 
 dependencies {
     implementation "org.springframework.boot:spring-boot-starter-web:$springBootVersion"
     implementation "org.springframework.boot:spring-boot-starter-validation:$springBootVersion"
-    implementation "org.springframework.boot:spring-boot-starter-security:$springBootVersion"
+    implementation "org.springframework.boot:spring-boot-starter-data-jpa:$springBootVersion"
 
     implementation "org.mapstruct:mapstruct:$mapStructVersion"
+
+    implementation "com.auth0:java-jwt:$auth0JwtVersion"
 
     compileOnly "org.projectlombok:lombok:$lombokVersion"
 
