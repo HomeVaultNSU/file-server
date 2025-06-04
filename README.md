@@ -57,6 +57,8 @@ To start **ELK** stack:
 
 1. run `./gradlew :elk:composeUp`
 
+***VPN reuqired**
+
 ## Reserved ports for services:
 
 - **File server**: `8080`
