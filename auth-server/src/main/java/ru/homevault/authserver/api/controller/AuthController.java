@@ -18,7 +18,7 @@ import ru.homevault.authserver.api.dto.TokenResponse;
 import ru.homevault.authserver.core.service.JwtService;
 import ru.homevault.authserver.core.service.UserService;
 
-@CrossOrigin("https://homevaultnsu.github.io/")
+@CrossOrigin("*")
 @Validated
 @RestController
 @RequestMapping("/auth")

@@ -26,7 +26,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
-@CrossOrigin("https://homevaultnsu.github.io/")
+@CrossOrigin("*")
 @Validated
 @RestController
 @RequiredArgsConstructor
