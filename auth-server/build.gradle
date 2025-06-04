@@ -58,6 +58,7 @@ ext {
     mapStructVersion = '1.6.2'
     auth0JwtVersion = '4.5.0'
     postgressqlDriverVersion = '42.7.2'
+    logstashEncoderVersion = '8.1'
 }
 
 dependencies {
@@ -69,6 +70,8 @@ dependencies {
     implementation "org.postgresql:postgresql:$postgressqlDriverVersion"
 
     implementation "org.mapstruct:mapstruct:$mapStructVersion"
+
+    implementation "net.logstash.logback:logstash-logback-encoder:$logstashEncoderVersion"
 
     implementation "com.auth0:java-jwt:$auth0JwtVersion"
 

@@ -51,6 +51,7 @@ ext {
     spockFrameworkRelease = '4.0'
     spockFrameworkVersion = '2.4'
     mapStructVersion = '1.6.2'
+    logstashEncoderVersion = '8.1'
 }
 
 dependencies {
@@ -59,6 +60,8 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-security:$springBootVersion"
 
     implementation "org.mapstruct:mapstruct:$mapStructVersion"
+
+    implementation "net.logstash.logback:logstash-logback-encoder:$logstashEncoderVersion"
 
     compileOnly "org.projectlombok:lombok:$lombokVersion"
 
